@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+<head>
+  <title>About</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/reset.css" type="text/css" media="all"></link>
+  <link rel="stylesheet" href="css/layout.css" type="text/css" media="all"></link>
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="all"></link>
+  <link rel="stylesheet" href="css/prettyPhoto.css" type="text/css" media="all"></link>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="js/jquery.nivo.slider.pack.js"></script> 
+  <script type="text/javascript" src="js/jquery.prettyPhoto.js"></script> 
+  <script type="text/javascript" src="js/cufon-yui.js"></script>
+  <script type="text/javascript" src="js/hover-image.js"></script>
+  <script type="text/javascript" src="js/cufon-replace.js"></script>  
+  <script type="text/javascript" src="js/CabinSketch_700.font.js"></script>
+  <script type="text/javascript" src="js/EB_Garamond_400.font.js"></script>
+ <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+ 
+ <script>
+ $(document).ready(
+		 function() {
+			   $('#nivo_slider').nivoSlider({
+			        effect:'fold', //Specify sets like: 'fold,fade,sliceDown, sliceDownLeft, sliceUp, sliceUpLeft, sliceUpDown, sliceUpDownLeft' 
+			        slices:7,
+			        animSpeed:500,
+			        pauseTime:6000,
+			        startSlide:0, //Set starting Slide (0 index)
+			        directionNav:true, //Next & Prev
+			        directionNavHide:false, //Only show on hover
+			        controlNav:true, //1,2,3...
+			        controlNavThumbs:false, //Use thumbnails for Control Nav
+			        controlNavThumbsFromRel:false, //Use image rel for thumbs
+			        controlNavThumbsSearch: '.jpg', //Replace this with...
+			        controlNavThumbsReplace: '_thumb.jpg', //...this in thumb Image src
+			        keyboardNav:true, //Use left & right arrows
+			        pauseOnHover:true, //Stop animation while hovering
+			        manualAdvance:false, //Force manual transitions
+			        captionOpacity:1, //Universal caption opacity
+			        beforeChange: function(){
+			        	var index = $('#nivo_slider').data('nivo:vars').currentSlide;
+
+			           	$("#slideDescription0").fadeOut();
+			           	$("#slideDescription1").fadeOut();
+			           	$("#slideDescription2").fadeOut();
+			           	$("#slideDescription3").fadeOut();
+			        },
+			        afterChange: function(){
+			           	var index = $('#nivo_slider').data('nivo:vars').currentSlide;
+
+			           	if (index == 0) {
+			               	$("#slideDescription0").fadeIn();
+			               	
+			           	} else if (index == 1) {
+			               	$("#slideDescription1").fadeIn();
+			               	
+			           	} else if (index == 2) {
+			               	$("#slideDescription2").fadeIn();
+			               	
+			           	} else if (index == 3) {
+			               	$("#slideDescription3").fadeIn();
+			           	}
+			        },
+			        slideshowEnd: function(){} //Triggers after all slides have been shown
+			    });
+
+			$("#services_menu").hover( 
+					function () { 
+						$("#submenu2").fadeIn(); 
+				  	},  
+				  	function () { 
+				  	} 
+				); 
+			
+			$("#submenu2").hover( 
+					function () { 
+				  	},  
+				  	function () { 
+						$("#submenu2").fadeOut(); 
+				  	} 
+				); 
+			
+			if ($("a[rel^='prettyPhoto']").length) {
+					// prettyPhoto
+					$("a[rel^='prettyPhoto']").prettyPhoto({theme:'facebook'});
+					
+					///// codegrabber ////////////
+					$(".code a.code-icon").toggle(function(){
+						$(this).addClass("minus").next("p").slideDown();
+					}, function(){
+						$(this).removeClass("minus").next("p").slideUp();
+					})
+			}
+		 }
+	 );
+					 
+ </script>
+ 
+  <!--[if lt IE 9]>
+  	<script type="text/javascript" src="js/html5.js"></script>
+	<style type="text/css">
+		.bg{ behavior: url(js/PIE.htc); }
+	</style>
+  <![endif]-->
+	<!--[if lt IE 7]>
+		<div style=' clear: both; text-align:center; position: relative;'>
+			<a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/images/upgrade.jpg" border="0"  alt="" /></a>
+		</div>
+	<![endif]-->
+
+	<script src="http://widgets.twimg.com/j/2/widget.js"></script>
+</head>
+
+<body id="page1">
+		<div class="main">
+			<!--header -->
+			<header>
+				<div class="wrapper">
+				<nav>
+					<ul id="menu">
+						<li id="menu_active"><a href="index.html"><span>H</span>ome</a></li>
+						<li><a id="services_menu" href="Services.html"><span>S</span>ervices</a></li>
+						<li><a href="Contacts.html"><span>C</span>ontact Us</a></li>
+					</ul>
+					
+					<UL id="submenu2" class="submenu">
+						<LI><a href="contactus.php"><span>W</span>eb Design</a></LI>
+						<LI><a href="request-a-callback.php"><span>B</span>espoke Development</a></LI>
+						<LI><a href="request-a-callback.php"><span>M</span>obile Development</a></LI>
+						<LI><a href="request-a-callback.php"><span>E</span>-Commerce</a></LI>
+					</UL>
+				</nav>
+				</div>
+				<h1><a href="index.html" id="logo">Prodigy<em>Works!</em></a></h1>
+				<div id="newLogo"></div>
+			</header><div class="ic"><div class="inner_copy">Find best premium and <a href="http://www.design4magento.com/free-magento-themes/" title="Magento themes"> free Magento themes</a> at Design4Magento.com</div></div>
+			<!--header end-->
+			<section id="content">
+				<div class="wrapper">
+				<article class="col1">
+					<h2>About Us</h2>
+					<div class="pad_left1 pad_bot1">
+						<div id="slider">
+							<div id="for_img">
+								<div id="nivo_slider">
+									<img src="images/www2.png" alt="">	
+									<img src="images/software.png" alt="">	
+									<img src="images/ecommerce.png" alt="">	
+									<img src="images/mobile.png" alt="">	
+									
+								</div>
+							</div>
+						</div>
+						<div class="pad">
+							<div id="slideDescriptionContainer">
+								<div id="slideDescription0">
+									<p>
+										At <strong>Prodigy Works</strong> we understand that your web site is the public portal to the world. We specialise in the creative process of designing, creation and hosting of your site.
+									</p>
+								</div>
+								<div id="slideDescription1">
+									<p>
+										We traditionally deliver web-based software products for an array of clients. However as our engineers have over 20 years of experience, we can turn our hand at almost all environments.
+									</p>
+								</div>
+								<div id="slideDescription2">
+									<p>
+										Build and manage your online shop with Prodigy Works! <br>E-commerce solution. <br>
+									</p>
+								</div>
+								<div id="slideDescription3">
+									<p>
+										Our mobile development division are dedicated to Windows Mobile development within a .NET environment.
+									</p>
+								</div>
+							</div>
+							<p>
+								At <strong>Prodigy Works</strong> we only employ experienced, yet leading edge graphic and web 
+								designers who together produce great designs that are also technically sound.
+							</p>
+						</div>
+					</div>
+					<h2><span>Our Solutions</span></h2>
+					<div class="pad_left1">
+						<div class="pad_left1">
+							<div class="wrapper pad_top1">
+								<div class="col3">
+									<div class="wrapper">
+										<figure class="left marg_right1"><img src="images/page1_img3.png" alt=""></figure>
+										<p class="cols"><strong class="font1">Development</strong><br>
+											We have over 20 years of experience of development within the IT industry, which covers multiple environments.
+										</p>
+									</div>	
+								</div>
+								<div class="col3 pad_left2">
+									<div class="wrapper">
+										<figure class="left marg_right1"><img src="images/page1_img5.png" alt=""></figure>
+										<p class="cols"><strong class="font1">Web Site Rental</strong><br>
+											If your company would prefer. We will design, create, optimise and host your web site
+											for a monthly <a href="rentalcharges.html">fee.</a>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="wrapper">
+								<div class="col3">
+									<div class="wrapper">
+										<figure class="left marg_right1"><img src="images/page1_img4.png" alt=""></figure>
+										<div class="cols"><strong class="font1">Planning</strong><br>
+											Consistent development framework providing repeatable process for estimating and planning IT projects.
+										</div>
+									</div>	
+								</div>
+								<div class="col3 pad_left2">
+									<div class="wrapper">
+										<figure class="left marg_right1"><img src="images/page1_img6.png" alt=""></figure>
+										<div class="cols">
+											<strong class="font1">E-Commerce</strong><br>
+												Build and manage your online shop with Prodigy Works! <br>E-commerce solution. <br>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+        		</article>
+				<article class="col2">
+					<h3 class="latestWorks">Latest Works</h3>
+					<ul class="ul_works">
+						<li>
+							<a class="lightbox-image" rel="prettyPhoto[group1]" href="images/screenshot-choresaway-large.png" >
+								<img src="images/choresaway-screenshot.png" alt="" />
+							</a>
+						</li>
+						<li>
+							<a class="lightbox-image" rel="prettyPhoto[group1]" href="images/screenshot-chuk-large.png" >
+								<img src="images/chuk-screenshot.png" alt="" />
+							</a>
+						</li>
+					</ul>
+					<h4 class="tweets">Recent Tweets</h4>
+					<div >
+						<script>
+						new TWTR.Widget({
+						  version: 2,
+						  type: 'profile',
+						  rpp: 11,
+						  interval: 6000,
+						  width: 'auto',
+						  height: 195,
+						  theme: {
+						    shell: {
+						      background: 'transparent',
+						      color: '#ffffff'
+						    },
+						    tweets: {
+						      background: 'transparent',
+						      color: '#ffffff',
+						      links: '#ffffff'
+						    }
+						  },
+						  features: {
+						    scrollbar: false,
+						    loop: false,
+						    live: true,
+						    hashtags: false,
+						    timestamp: false,
+						    avatars: false,
+						    behavior: 'all'
+						  }
+						}).render().setUser('ProdigyWrks').start();
+						</script>
+					</div>
+        		</article>
+				</div>
+				
+			</section>
+			<!--content end-->
+			<!--footer -->
+			<footer>
+				<div class="wrapper">
+					<article class="col">
+						<h5>Why Us</h5>
+						<ul class="list1">
+							<li><a href="#">Commercial expertise</a></li>
+							<li><a href="#">Website rental system</a></li>
+							<li><a href="#">All under one roof</a></li>
+						</ul>
+					</article>
+					<article class="col pad_left2">
+						<h5>Links</h5>
+						<ul class="list1">
+							<li><a href="http://www.choresaway.co.uk">Chores Away</a></li>
+							<li><a href="http://www.denbyequestrial.com">Denby Equestrian</a></li>
+							<li><a href="http://www.centralhydraulicuk.com">Central Hydraulic UK</a></li>
+						</ul>
+					</article>
+					<article class="col pad_left2">
+						<h5>Follow Us</h5>
+						<ul class="icons">
+							<li><a href="#"><img src="images/icon1.jpg" alt="">Facebook</a></li>
+							<li><a href="#"><img src="images/icon2.jpg" alt="">LinkedIn</a></li>
+							<li><a href="http://www.twitter.com/ProdigyWrks"><img src="images/icon3.jpg" alt="">Twitter</a></li>
+						</ul>
+					</article>
+					<article id="newsletter">
+						<h5>Newsletter</h5>
+						<form id="newsletter_form">
+							<div class="wrapper">
+								<input class="input" type="text" value="Enter your email here"  onblur="if(this.value=='') this.value='Enter your email here'" onfocus="if(this.value =='Enter your email here' ) this.value=''" >
+							</div>
+							<a href="#" onclick="document.getElementById('newsletter_form').submit()">Subscribe</a>
+						</form>
+					</article>
+				</div>
+					<span class="copyright">
+						Copyright 2011 ProdigyWorks Ltd.
+					</span>
+					<a href="index.html" class="footer_logo">Prodigy<span>Works</span>.co.uk</a>
+
+<!--					<p><a href="http://www.freedigitalphotos.net/images/view_photog.php?photogid=1970">Image: winnond / FreeDigitalPhotos.net</a></p> -->
+			</footer>
+			<!--footer end-->
+		</div>
+<script type="text/javascript"> Cufon.now(); </script>
+</body>
+</html>

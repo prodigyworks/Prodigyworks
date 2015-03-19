@@ -1,0 +1,133 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="js/jquery-1.4.2.min.js" type="text/javascript"></script>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+<style>
+.middle {
+	position: absolute;
+	top: 230px;
+	left: 250px;
+}
+
+.hide {
+	display:none;
+}
+</style>
+<script type="text/javascript" >
+var ctx;
+var circleX = 0;
+var direction = 1;
+var radius = 200;
+var current_degrees = new Array();
+var padding = 350;
+var defaultFontSize = 22;
+var fontSizes = new Array();
+var currentImageLoop = 1;
+var speed = 20;
+
+function start_animation()
+{
+	current_degrees[0] = 0;
+	current_degrees[1] = 90;
+	current_degrees[2] = 180;
+	current_degrees[3] = 270;
+
+	for (var i = 0; i < current_degrees.length; i++) {
+		fontSizes[i] = defaultFontSize;
+	}
+	
+    var element = document.getElementById("drawing_canvas");
+    ctx = element.getContext("2d");
+    var interval = setInterval(animate, 1000 / speed);
+}
+function animate() {
+    ctx.beginPath();               
+    ctx.clearRect(0, 0, 800, 600);
+    
+	animateText("Text 1", 0);
+	animateText("Text 2", 1);
+	animateText("Text 3", 2);
+	animateText("Text 4", 3);
+
+    ctx.closePath();               
+    ctx.stroke(); 
+}
+
+function animateText(text, index) {
+	var current_degree = current_degrees[index];
+	var fontSize = fontSizes[index];
+	
+	if (current_degree > 376) {
+		current_degree = 0;
+	}
+
+    var X = Math.cos(current_degree / 60) * radius;                 
+    var Y = Math.sin(current_degree / 60) * radius;                 
+    
+    if (current_degree > 338) {
+        if (! (current_degree % 1) && fontSize >= defaultFontSize) {
+            fontSize--;
+        }
+        
+    } else if (current_degree >= 300) {
+        if (! (current_degree % 1)) {
+            fontSize++;
+        }
+            
+    } else {
+        fontSize = defaultFontSize;
+    }
+	
+    if (current_degree == 300) {
+        $("#image" + currentImageLoop++).fadeOut();
+
+		if (currentImageLoop > 4) {
+			currentImageLoop = 1;
+		}
+        
+        $("#image" + currentImageLoop).fadeIn();
+    }
+
+    ctx.strokeStyle = "black";
+    ctx.font = "Bold " + fontSize +  "pt Arial, serif";
+    ctx.fillStyle = 'red';
+    ctx.shadowColor = "rgba( 0, 0, 0, 0.2 )";
+
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+        
+    ctx.fillText(text, X + padding, Y + padding);
+
+    current_degree++;
+
+    current_degrees[index] = current_degree;
+    fontSizes[index] = fontSize;
+}
+
+$(document).ready(
+			function() {
+				start_animation();
+			}
+		);
+</script>
+</head>
+<body>
+	<h2>Test</h2>
+	
+	<canvas id="drawing_canvas" width="800" height="600" style="border: 1px solid black"></canvas>
+	<div class="middle" id="image1">
+		<img src="images/picture1.png" />
+	</div>
+	<div class="middle hide" id="image2">
+		<img src="images/picture2.png" />
+	</div>
+	<div class="middle hide" id="image3">
+		<img src="images/picture3.png" />
+	</div>
+	<div class="middle hide" id="image4">
+		<img src="images/picture4.png" />
+	</div>
+</body>
+</html>

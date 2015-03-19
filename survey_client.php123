@@ -1,0 +1,739 @@
+<?php session_start();
+
+
+
+
+
+
+
+$date = date("l jS F Y");
+$y = date("Y");
+$m = date("M");
+include ('MySQL_connect.php');
+//check to see if already logged in
+if (isset($_SESSION['user_id'])) {
+    $loggedname = $_SESSION['user_id'];
+}
+else {
+//if not logged in check for username and password
+    $username = $_GET['username'];
+    $password = $_GET['password'];
+//if not set redirect to login page
+    if( ( !$username ) or ( !$password ) ) {
+        header( "Location:index.php" );
+        exit();
+    }
+
+
+    $referrer = $_GET['referrer'];
+    if($referrer=='admin') {
+        $md5_pass = $password;
+        $calview='yes';
+//echo"admin login.........$md5_pass"; exit();
+    }
+    else {
+        $md5_pass = md5($password);
+//echo'standard login.........'; exit();
+    }
+///////////////////////
+//$md5_pass = md5($password);
+    $sql = "SELECT * FROM `users` WHERE ((`user_name` = '$username') OR (`email` = '$username')) and password = '$md5_pass' ";
+    $rs = mysql_query( $sql, $conn ) or die( "Could not execute query" );
+    $num = mysql_numrows( $rs );
+    if( $num != 0 ) {
+        $query_client = mysql_query("SELECT * FROM `users` WHERE password='$md5_pass' AND ((`user_name` = '$username') OR (`email` = '$username'))");
+        $row_client = mysql_fetch_array($query_client) or die( "incorrect password" );
+        $_SESSION['user_id'] = $row_client['user_id'];
+        $loggedname = $row_client['user_id'];
+        $name = $row_client['user_name'];
+        $email = $row_client['email'];
+        $initials = $row_client['initials'];
+    }
+    else {
+        header( "Location:index.php?loginerror=yes" );
+        exit();
+    }
+}
+/////////////////////
+
+$query_client = mysql_query("SELECT * FROM `users` WHERE user_id='$loggedname' ");
+$row_client = mysql_fetch_array($query_client) or die( "incorrect password" );
+$name = $row_client['user_name'];
+$email = $row_client['email'];
+
+
+
+if(isset($_GET['upcoming'])) {
+    $upcoming = $_GET['upcoming'];
+}
+else {
+    $upcoming = 14;
+}
+
+$_SESSION['nickname'] = $name;
+
+$nickname = isset($_SESSION['nickname']) ? $_SESSION['nickname'] : "Hidden";
+
+if($calview) {
+    header( "Location:/diary/crm/" );
+    exit();
+}
+
+
+
+
+
+?>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title> <?php echo $name ?>'s Diary : Pestokill CRM </title>
+        <meta http-equiv="Content-Language" content="en-gb" />
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" />
+        <meta name="MSSmartTagsPreventParsing" content="TRUE" />
+        <meta name="ROBOTS" content="NOINDEX,NOFOLLOW" />
+        <meta name="GOOGLEBOT" content="NOFOLLOW, NOINDEX" />
+        <link rel="stylesheet" href="default.css" type ="text/css" />
+        <link rel="shortcut icon" href="favicon.ico" />
+
+        <script language="javascript" type="text/javascript">
+            <!--
+            var httpObject = null;
+            var link = "";
+            var timerID = 0;
+            var nickName = "<?php echo $nickname; ?>";
+
+            // Get the HTTP Object
+            function getHTTPObject(){
+                if (window.ActiveXObject) return new ActiveXObject("Microsoft.XMLHTTP");
+                else if (window.XMLHttpRequest) return new XMLHttpRequest();
+                else {
+                    alert("Your browser does not support AJAX.");
+                    return null;
+                }
+            }
+
+            // Change the value of the outputText field
+            function setOutput(){
+                if(httpObject.readyState == 4){
+                    var response = httpObject.responseText;
+                    var objDiv = document.getElementById("result");
+                    objDiv.innerHTML += response;
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                    var inpObj = document.getElementById("msg");
+                    inpObj.value = "";
+                    inpObj.focus();
+                }
+            }
+
+            // Change the value of the outputText field
+            function setAll(){
+                if(httpObject.readyState == 4){
+                    var response = httpObject.responseText;
+                    var objDiv = document.getElementById("result");
+                    objDiv.innerHTML = response;
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                }
+            }
+
+            // Implement business logic
+            function doWork(){
+                httpObject = getHTTPObject();
+                if (httpObject != null) {
+                    link = "message.php?nick="+nickName+"&msg="+document.getElementById('msg').value;
+                    httpObject.open("GET", link , true);
+                    httpObject.onreadystatechange = setOutput;
+                    httpObject.send(null);
+                }
+            }
+
+            // Implement business logic
+            function doReload(){
+                httpObject = getHTTPObject();
+                var randomnumber=Math.floor(Math.random()*10000);
+                if (httpObject != null) {
+                    link = "message.php?all=1&rnd="+randomnumber;
+                    httpObject.open("GET", link , true);
+                    httpObject.onreadystatechange = setAll;
+                    httpObject.send(null);
+                }
+            }
+
+            function UpdateTimer() {
+                doReload();
+                timerID = setTimeout("UpdateTimer()", 5000);
+            }
+
+
+            function keypressed(e){
+                if(e.keyCode=='13'){
+                    doWork();
+                }
+            }
+            //-->
+        </script>
+
+
+
+
+
+        <script type="text/javascript" src="crm/js/dtpicker.js"></script>
+        <script type="text/javascript" src="crm/js/cpicker.js"></script>
+        <script type="text/javascript" src="crm/js/poptext.js"></script>
+        <script type="text/javascript" src="crm/js/general.js"></script>
+
+        <script type="text/javascript">
+            <!--
+            function open_window(link,w,h) //open popup window script
+            {
+                var width = w;
+                var height = h;
+
+                var left = parseInt((screen.availWidth/2) - (width/2));
+                var top = parseInt((screen.availHeight/2) - (height/2));
+                var win = "width="+w+",height="+h+", top="+top+", left="+left+"; menubar=no,location=no,resizable=no,scrollbars=yes";
+                newWin = window.open(link,'newWin',win);
+                newWin.focus();
+            }
+
+            // End -->
+        </script>
+
+
+
+        <script type="text/javascript">
+            <!--
+            function MM_jumpMenu(targ,selObj,restore){ //v3.0
+                eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+                if (restore) selObj.selectedIndex=0;
+            }
+            //-->
+        </script>
+
+
+        <link type="text/css" href="javascript/jquery-ui/css/jquery-ui-1.8.2.custom.css" rel="stylesheet" />
+        <link rel="stylesheet" href="javascript/tabs/jquery.tabs.css" type="text/css">
+
+            <script type="text/javascript" src="javascript/jquery-1.3.2.min.js"></script>
+
+            <script language="Javascript" src="javascript/jquery.quicksearch.js"></script>
+
+            <script language="Javascript" src="javascript/jquery.validationEngine.js"></script>
+            <script language="Javascript" src="javascript/jquery.validationEngine-en.js"></script>
+            <script language="Javascript" src="javascript/main.js"></script>
+            <script type="text/javascript" src="javascript/jquery-ui/jquery-ui-1.8.2.custom.min.js"></script>
+            <script type="text/javascript" src="javascript/jquery-ui/jquery-ui-timepicker-addon-0.5.js"></script>
+
+            <script type="text/javascript" src="javascript/jquery.timers-1.2.js"></script>
+            <script type="text/javascript" src="javascript/tabs/jquery.tabs.min.js"></script>
+
+
+            <script type="text/javascript" src="javascript/tooltip.js"></script>
+
+            <script type="text/javascript">
+                $(function() {
+                    $('#container-1').tabs();
+
+                });
+
+
+            </script>
+
+
+
+    </head>
+
+    <body onLoad="UpdateTimer();">
+
+        <div id="maincontainer">
+
+            <div id="topsection">
+                <div class="top">
+                    <h4 class="floatR">current user : <?php echo $name ?></h4>
+                    <h4>Pestokill</h4>
+                </div>
+                <div class="navBar">
+
+                    &nbsp;
+
+                    <div class="nav1" style="position:relative; float:left; height:25px; overflow:hidden">
+                        <strong>Change Upcoming Events Period (days):</strong>
+                    </div>
+
+                    <div class="nav2" style="position:relative; float:left; height:25px; overflow:hidden">
+
+                        <form method="get" name="form" id="form">
+                            <table width="300" border="0">
+                                <tr>
+                                    <td valign="middle">
+                                        <select name="upcoming" id="upcoming" onchange="MM_jumpMenu('parent',this,0)">
+
+                                            <?php echo "<option value=\"clients.php?upcoming=$upcoming\">$upcoming</option>"; ?>
+                                            <?php
+                                            if($upcoming!=7) {
+                                                echo"<option value=\"clients.php?upcoming=7\">7</option>";
+                                            }
+                                            if($upcoming!=14) {
+                                                echo"<option value=\"clients.php?upcoming=14\">14</option>";
+                                            }
+                                            if($upcoming!=21) {
+                                                echo"<option value=\"clients.php?upcoming=21\">21</option>";
+                                            }
+                                            if($upcoming!=28) {
+                                                echo"<option value=\"clients.php?upcoming=28\">28</option>";
+                                            }
+                                            ?>
+                                        </select>&nbsp;</td>
+                                </tr>
+                            </table>
+                        </form></div>
+
+                    <div class="nav3" style="position:relative; float:right; height:25px; overflow:hidden">
+                        <a href="#x" onclick="x=eventWin('crm/index.php?page=10&user_admin_name=<?php echo $name?>'); x.focus();return false">Add Event</a>&nbsp; | &nbsp;
+                        <a href="crm?user_admin_name=<?php echo $name?>">Calandar View</a>&nbsp; | &nbsp;<a href="search.php">Search</a>&nbsp; | &nbsp;<a href="index.php?logout=yes">Logout</a>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="contentwrapper">
+            <div id="contentcolumn">
+                <div class="innertube">
+
+                    <?php
+
+                    echo '<h4>Surveys</h4>';
+
+                    function surveyer_list($surveyor) {
+                        $q = "SELECT * from users order by user_name";
+                        $query = mysql_query($q);
+                        if (!$query) echo "Database Error : ".$q."<br />";
+                        else {
+                            echo "<option value=\"\"></option>\n";
+                            while ($row=mysql_fetch_array($query)) {
+                                $selected = ($surveyor == $row['user_name']) ? 'selected' :  '';
+                                echo "<option value=\"".$row['user_name']."\" $selected >".$row['user_name']."</option>\n";
+                            }
+                        }
+                    }
+
+                    ?>
+
+                    <div>
+                        <form name="filterfrm" method="post" action="">
+                            Filter: <select name="period" style="width:100px;" >
+                                <option value=""></option>
+                                <option value="current_week"<?php echo ($_POST["period"] == "current_week") ? ' selected="true">' : ">";?>Current Week</option>
+                                <option value="last_7_days"<?php echo ($_POST["period"] == "last_7_days") ? ' selected="true">' : ">";?>Last 7 Days</option>
+                                <option value="this_month"<?php echo ($_POST["period"] == "this_month") ? ' selected="true">' : ">";?>This Month</option>
+                            </select>
+                            <select name="surveystatus" style="width:100px;"  >
+                                <option value=""<?php echo ($_POST["surveystatus"] == "") ? ' selected="true">' : ">";?>All</option>
+                                <option value="Live"<?php echo ($_POST["surveystatus"] == "Live") ? ' selected="true">' : ">";?>Live</option>
+                                <option value="Live"<?php echo ($_POST["surveystatus"] == "Not Now") ? ' selected="true">' : ">";?>Not Now</option>
+                                <option value="Dead"<?php echo ($_POST["surveystatus"] == "Dead") ? ' selected="true">' : ">";?>Dead</option>
+                                <option value="Accepted"<?php echo ($_POST["surveystatus"] == "Accepted") ? ' selected="true">' : ">";?>Accepted</option>
+                            </select>
+                            <select name="st" id="st" style="width:100px;" >
+                                <option value=""></option>
+                                <option value="Job"<?php echo ($_POST["st"] == "Job") ? ' selected="true">' : ">";?>Job</option>
+                                <option value="Contract"<?php echo ($_POST["st"] == "Contract") ? ' selected="true">' : ">";?>Contract</option>
+                                <option value="Product"<?php echo ($_POST["st"] == "Product") ? ' selected="true">' : ">";?>Product</option>
+                            </select>
+                            <select name="surveyor" style="width:100px;"  />
+<?php surveyer_list($_POST["surveyor"]); ?>
+                            </select>
+                            <br /><br />
+                            <div style="float:right;margin-right:34px;">
+                                <input class="submit_button" type="submit" value="Search" style="margin-right:20px;" onclick="javascript:filter_recs();" />
+                                <input class="submit_button" type="button" value="Export Selection" onclick="javascript:export_selected();" />
+                            </div>
+                        </form>
+                    </div>
+                    <br clear="both" />
+                    <br />
+
+                    <script>
+                        function export_selected(){
+                            document.filterfrm.action = "ExportSurvey.php";
+                            document.filterfrm.submit();
+                        }
+
+                        function filter_recs(){
+                            document.filterfrm.action = "";
+                            document.filterfrm.submit();
+                        }
+
+                    </script>
+
+                    <style>
+                        input.submit_button {
+                            background-color: #FFFFFF;
+                            border-color: #666666;
+                            border-style: solid;
+                            border-width: 1px;
+                            color: #666666;
+                            cursor: pointer;
+                            font-size: 12px;
+                            padding: 4px 8px;
+                        }
+
+                        td {
+                            padding: 2px;
+                        }
+                    </style>
+
+<?php
+
+$where = array();
+
+                    $cur_mnth = date('m');
+
+                    if($_POST["surveystatus"]) $where[] = "surveystatus = '".$_POST["surveystatus"]."' ";
+                    if($_POST["st"]) $where[] = "service_type = '".$_POST["st"]."' ";
+                    if($_POST["surveyor"]) $where[] = "surveyor = '".$_POST["surveyor"]."' ";
+                    if($_POST["period"]) {
+                        if($_POST["period"] == 'current_week') $where[] = "(date_format(start_date, '%u') = date_format(curdate(), '%u') && date_format(start_date, '%Y') = date_format(curdate(), '%Y')) ";
+                        else if($_POST["period"] == 'last_7_days') $where[] = "(datediff(curdate(), start_date) <= 7 && datediff(curdate(), start_date) >= 0 )";
+                        else if($_POST["period"] == 'this_month') $where[] = "date_format(start_date, '%m') =  '$cur_mnth'";
+                    }
+
+                    if($where) $where_clause = 'where '. implode(' and ', $where);
+
+                    $q = "select * from survey $where_clause";
+                    $master_records = msq_select_many($q);
+
+                    if($master_records) {
+                        foreach($master_records as $master) {
+
+                            echo '<div style="float:right;">
+					<a href="delete_survey.php?id='.$master['survey_id'].'"><img src="images/close.png" width="16" /></a><br /><br />
+					<a href="#x" onclick="x=eventWin(\'crm/admin4854.php?page=22&survey_id='.$master['survey_id'].'\'); x.focus();return false"><img src="user_edit.png" /></a>
+					</div>';
+
+                            echo '<table cellpadding="8" cellspacing="0" border="1" width="95%">';
+
+                            echo '<tr bgcolor="cccccc">';
+                            echo '<td width="20%"><b> Survey ID</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['recordid'].'</td>';
+                            echo '<td width="20%"><b> Surveyor</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['surveyor'].'</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Service Type</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['service_type'].'</td>';
+                            echo '<td width="20%"><b> Requirement</b></td>';
+                            echo '<td colspan="3">&nbsp;'.$master['requirement'].'</td>';
+
+                            echo '</tr>';
+                            echo '<td width="20%"><b> Specific Requirements</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['interest'].'</td>';
+                            echo '<tr>';
+
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Int Monitors</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['int_monitor'].'</td>';
+                            echo '<td width="20%"><b> Ext Monitors</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['ext_monitor'].'</td>';
+                            echo '</tr>';
+
+
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Pest Serv Freq</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['past_serv_freq'].'</td>';
+                            echo '<td width="20%"><b> Fly Killers Efk</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['fly_killers_efk'].'</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b>Fly Killers Glue</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['fly_killers_glue'].'</td>';
+                            echo '<td width="20%"><b>Moth Traps</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['moth_traps'].'</td>';
+                            echo '</tr>';
+
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Wasp Traps</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['wasp_traps'].'</td>';
+                            echo '<td width="20%"><b> Flying Serv Freq</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['flying_serv_freq'].'</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Audit</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['audit'].'</td>';
+                            echo '<td width="20%"><b> Charge</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['charge'].'</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b>Time on Site</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['start_time'].'</td>';
+                            echo '<td width="20%"><b> No. of Men</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['no_of_men'].'</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Accepted</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['accepted'].'</td>';
+                            echo '<td width="20%"><b> Start Date</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['start_date'].'</td>';
+                            echo '</tr>';
+
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Raised Date</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['date_raised'].'</td>';
+                            echo '<td width="20%"><b> Followup Date</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['follow_up'].'</td>';
+                            echo '</tr>';
+
+
+
+
+                            if($master['file_1']) {
+                                $f1_extn = '.'.end(explode('.', $master['file_1']));
+                                $file_1_name = 'file_1_'.$master['survey_id'].$f1_extn;
+                            }
+
+                            if($master['file_2']) {
+                                $f2_extn = '.'.end(explode('.', $master['file_2']));
+                                $file_2_name = 'file_2_'.$master['survey_id'].$f2_extn;
+                            }
+
+                            if($master['file_3']) {
+                                $f3_extn = '.'.end(explode('.', $master['file_3']));
+                                $file_3_name = 'file_3_'.$master['survey_id'].$f3_extn;
+                            }
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Files</b></td>';
+                            echo '<td colspan="3">
+						<a target="_blank" href="../quotes/'.$file_1_name.'">'.$master['file_1'].'</a><br />
+						<a target="_blank" href="../quotes/'.$file_2_name.'">'.$master['file_2'].'</a><br />
+						<a target="_blank" href="../quotes/'.$file_3_name.'">'.$master['file_3'].'</a><br />
+					</td>';
+                            echo '</tr>';
+
+                            echo '<tr>';
+                            echo '<td width="20%"><b> Survey Status</b></td>';
+                            echo '<td width="30%">&nbsp;'.$master['surveystatus'].'</td>';
+                            echo '</tr>';
+
+                            echo '</table>';
+                            echo '<br/><br/>';
+                        }
+                    }
+
+
+
+// MYSQL SPECIFIC STUFF
+
+                    function msq_select_many($query) {
+                        $rs = mysql_query($query);
+                        if(mysql_error()) trigger_error(mysql_error(), mysql_errno());
+                        if(!$rs) {
+                            return FALSE;
+
+                        } elseif(!mysql_num_rows($rs)) {
+                            return FALSE;
+
+                        } else {
+                            while ($row = mysql_fetch_array($rs, MYSQL_ASSOC)) $row_list[]=$row;
+                            return $row_list;
+                        }
+                    }
+
+
+
+
+
+                    /**
+                     *   Generic SELECT query
+                     */
+                    function msq_select_one($query) {
+                        $rs = mysql_query($query);
+                        if(mysql_error()) trigger_error(mysql_error(), mysql_errno());
+                        if(!$rs) {
+
+                            return FALSE;
+
+                        } elseif(!mysql_num_rows($rs)) {
+                            return FALSE;
+
+                        } else {
+                            $row = mysql_fetch_array($rs, MYSQL_ASSOC);
+                            return $row;
+                        }
+                    }
+
+
+
+
+                    /**
+                     *   Generic UPDATE query
+                     */
+                    function msq_update($query) {
+                        $success = mysql_query($query);
+                        if(mysql_error()) trigger_error(mysql_error(), mysql_errno());
+                        if(!$success) {
+
+                        }
+                        return $success;
+                    }
+
+
+                    ?>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+
+        <div id="leftcolumn">
+            <div class="innertube">
+
+                <h3>User Details</h3>
+                <p class="f4"><strong>ID : </strong><?php echo $user_id ?><?php echo $loggedname ?></p>
+                <p class="f4"><strong>Name : </strong><?php echo $name ?></p>
+                <p class="f4"><strong>Email : </strong><?php echo $email ?></p>
+                <p class="f4"><strong>View Leads : </strong><a href="simpleContact/loggedCalls.php?surveyor=<? echo $initials ?>" target="_blank">View</a></p>
+                <p class="f4"><strong>Input Leads : </strong><a href="simpleContact/logCo.php?initials=<? echo $initials ?>" target="_blank">Go</a></p>
+
+                <h3>Category Colour Codes</h3>
+<?php
+$q = "SELECT * FROM categories ORDER BY sequence";
+$query = mysql_query($q);
+                echo "<table cellspacing=\"0\" cellpadding=\"5\">\n";
+                while ($row=mysql_fetch_row($query)) {
+
+                    $font= $row[3];
+
+                    echo "<tr><td onclick=\"parent.location.href='clients.php?filter1=".$row[2]."&filter1name=".$row[1]."&sort=$sort&searchname=$searchname&searchvenue=$searchvenue'\" valign=\"middle\" width=\"220px\" style=\"cursor: pointer; cursor: hand; color: ".$row[3]."; background-color: ".$row[4].";\"><span class=\"f3\"><font color=\"$font\"> &nbsp;".$row[2]."&nbsp;&nbsp;".$row[1]."</font></span></td></tr>";
+
+
+                    //echo "<tr><td valign=\"middle\" width=\"200px\" style=\"color: ".$row[3]."; background-color: ".$row[4].";\">&nbsp;<span class=\"f3\"><font color=\"$font\">&nbsp;&nbsp;".$row[1]."</font></span></td>";
+
+                }
+
+
+
+
+                ?>
+
+                <tr><td onclick="parent.location.href='clients.php'" valign="middle" width="200px" style="cursor:pointer; cursor:hand; color:#fffff; background-color:#333;"><span class="f3">&nbsp;&raquo;&nbsp;&nbsp;View All</span></td></tr>
+                </table>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+
+
+        <div id="rightcolumn">
+            <div class="innertube">
+
+                <div id="box1" style="position:relative; padding:5px; margin-top:10px; margin-bottom:5px; border:#CCC 1px solid">
+<?php
+echo "<a class=\"useredit\" href=\"clients.php\" ><strong>Home</strong></a><br/>";
+echo "<a class=\"useredit\" href=\"javascript:open_window('adminpass.php?userref=$cal4585495admin',500, 360)\"><strong>update login</strong></a><br/>";
+
+                    echo "<a class=\"useredit\" href=\"javascript:open_window('adminemail.php?userref=$cal4585495admin',500, 265)\"><strong>update details</strong></a><br/>";
+
+                    echo "<a class=\"useredit\" href=\"simpleContact/loggedCalls.php?admin=yes\" target=\"_blank\"><strong>View Leads</strong></a><br/>";
+                    echo "<a class=\"useredit\" href=\"simpleContact/logCo.php?admin=yes\" target=\"_blank\"><strong>Enter Lead</strong></a><br/>";
+//echo "<a class=\"useredit\" href=\"http://www.diary.pestokill.co.uk/client.php\" target=\"_blank\"><strong>Cient Entry Form</strong></a><br/>";
+
+                    echo "<a class=\"useredit\" href=\"#x\" onclick=\"x=eventWin('crm/admin4854.php?page=14'); x.focus();return false\"><strong>Add Master Record</strong></a><br/>";
+                    echo "<a class=\"useredit\" href=\"master_client_view.php\" ><strong>All Master Records</strong></a><br/>";
+                    echo "<a class=\"useredit\" href=\"clients.php#tasks\" ><strong>Task list</strong></a><br/>";
+                    echo "<a class=\"useredit\" href=\"company_client.php\"><strong>Track by company</strong></a><br/>";
+                    echo "<a class=\"useredit\" href=\"survey_client.php\" ><strong>All Surveys</strong></a><br/>";
+
+                    ?>
+
+
+                </div>
+
+                <h3>Live Chat</h3>
+
+<?php
+
+if (!isset($_SESSION['nickname']) ) {
+                    createForm();
+                } else {
+                    $name    = isset($_POST['name']) ? $_POST['name'] : "Unnamed";
+                    $_SESSION['nickname'] = $name;
+                    ?>
+
+                <div id="result">
+                    <?php
+    $data = file("msg.html");
+    foreach ($data as $line) {
+                            echo $line;
+                        }
+                        ?>
+                </div>
+                <div id="sender" onKeyUp="keypressed(event);">
+                    new msg:
+                    <textarea name="msg" id="msg" style="width:222px" cols="5" rows="5"></textarea>
+
+                    <button class="loginbutton" onClick="doWork();"> Send </button>
+                </div>
+    <?php
+}
+
+                ?>
+
+<!--<table width="100%" border="0" cellpadding="5" cellspacing="2" bgcolor="#f1f1f1">
+  <tr>
+    <td colspan="2" bgcolor="#EAEAEA">&nbsp;<span class="f2">Sales Figures <?php echo $m ?></span></td>
+  </tr>
+  <tr>
+    <td width="90" bgcolor="#EAEAEA">&nbsp;<span class="f2">Quotes</span></td>
+    <td bgcolor="#E5E5E5">&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EAEAEA">&nbsp;<span class="f2">Job</span></td>
+    <td bgcolor="#E5E5E5">&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EAEAEA">&nbsp;<span class="f2">Contract</span></td>
+    <td bgcolor="#E5E5E5">&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EAEAEA">&nbsp;<span class="f2">Accepted</span></td>
+    <td bgcolor="#E5E5E5">&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EAEAEA">&nbsp;<span class="f2">Appointments</span></td>
+    <td bgcolor="#E5E5E5">&nbsp;</td>
+  </tr>
+</table> -->
+
+
+            </div>
+        </div>
+
+        <div id="footer"><a href="#">&copy;<?php echo $y ?> Pestokill Limited</a></div>
+
+        </div>
+    </body>
+</html>
